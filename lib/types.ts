@@ -1,4 +1,4 @@
-export type Role = 'Admin' | 'Manager' | 'Employee';
+export type Role = "admin" | "manager" | "employee";
 
 export type Product = {
   id: string;
@@ -35,7 +35,7 @@ export type Sale = {
   grandTotal: number;
 };
 
-export type StockLevel = 'in' | 'low' | 'out';
+export type StockLevel = "in" | "low" | "out";
 
 export const stockLevel = (qty: number): StockLevel =>
-  qty <= 0 ? 'out' : qty < 5 ? 'low' : 'in';
+  qty <= 0 ? "out" : qty < 5 ? "low" : "in";
