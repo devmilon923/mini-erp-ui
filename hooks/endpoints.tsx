@@ -1,5 +1,5 @@
 import { TLogin } from "@/validation/auth";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 
 const serverURL = process.env.NEXT_PUBLIC_Backend_URL as string;
@@ -54,13 +54,15 @@ export const useLoginUser = () => {
 };
 
 export const useProfile = () => {
-  return useMutation({
-    mutationFn: async () => {
+  return useQuery({
+    queryKey: ["profile"],
+    queryFn: async () => {
       const result = await api.get("/user/profile");
-      return result.data;
+      return result.data.data;
     },
     // onSuccess: (data) => {
     //   console.log(data);
     // },
   });
 };
+export default api;

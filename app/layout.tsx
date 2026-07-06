@@ -2,6 +2,7 @@ import QueryProvider from "@/provider/query";
 import "./globals.css";
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
+import { AuthProvider } from "@/provider/auth";
 
 const body = Inter({ subsets: ["latin"], variable: "--font-body" });
 const heading = Space_Grotesk({
@@ -23,7 +24,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${body.variable} ${heading.variable}`}>
       <body>
-        <QueryProvider>{children}</QueryProvider>
+        <QueryProvider>
+          <AuthProvider>{children}</AuthProvider>
+        </QueryProvider>
       </body>
     </html>
   );
