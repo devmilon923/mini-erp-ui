@@ -5,6 +5,7 @@ import axios from "axios";
 const serverURL = process.env.NEXT_PUBLIC_Backend_URL as string;
 const api = axios.create({
   baseURL: serverURL,
+  withCredentials: true,
 });
 const AUTH_FLAG_KEY = "logged_in";
 export function setAuthFlag() {
@@ -49,5 +50,17 @@ export const useLoginUser = () => {
       setAuthFlag();
       queryClient.invalidateQueries({ queryKey: ["profile"] });
     },
+  });
+};
+
+export const useProfile = () => {
+  return useMutation({
+    mutationFn: async () => {
+      const result = await api.get("/user/profile");
+      return result.data;
+    },
+    // onSuccess: (data) => {
+    //   console.log(data);
+    // },
   });
 };

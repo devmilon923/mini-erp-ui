@@ -15,6 +15,7 @@ import type { Role } from "@/lib/types";
 import { RoleBadge } from "@/components/shared/role-badge";
 import { loginValidation } from "@/validation/auth";
 import z from "zod";
+import { useLoginUser } from "@/hooks/endpoints";
 
 export const ROLES: Role[] = ["admin", "manager", "employee"];
 
@@ -22,7 +23,7 @@ type LoginFormData = z.infer<typeof loginValidation>;
 
 export default function LoginPage() {
   const router = useRouter();
-
+  const login = useLoginUser();
   const [selectedRole, setSelectedRole] = useState<Role>("admin");
 
   const {
@@ -37,13 +38,18 @@ export default function LoginPage() {
     },
   });
 
-  const onSubmit = (data: LoginFormData) => {
+  const onSubmit = async (data: LoginFormData) => {
+    const result = await login.mutateAsync({
+      ...data,
+      role: selectedRole,
+    });
     console.log({
       ...data,
       role: selectedRole,
     });
+    console.log(result);
 
-    router.push("/dashboard");
+    // router.push("/dashboard");
   };
 
   return (
