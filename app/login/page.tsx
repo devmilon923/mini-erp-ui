@@ -28,7 +28,9 @@ export default function LoginPage() {
 
   const {
     register,
+
     handleSubmit,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginValidation),
@@ -39,17 +41,17 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (data: LoginFormData) => {
-    const result = await login.mutateAsync({
-      ...data,
-      role: selectedRole,
-    });
-    console.log({
-      ...data,
-      role: selectedRole,
-    });
-    console.log(result);
-
-    // router.push("/dashboard");
+    try {
+      await login.mutateAsync({
+        ...data,
+        role: selectedRole,
+      });
+      router.push("/dashboard");
+    } catch (error: any) {
+      setError("email", { message: "Invalid email address" });
+      setError("password", { message: "Invalid password" });
+      console.log("Login failed", error.response.data.message);
+    }
   };
 
   return (

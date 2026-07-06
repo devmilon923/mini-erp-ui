@@ -44,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [data, isSuccess, setUser]);
 
   const logout = async () => {
-    await api.get(backendURL + "/auth/logout");
+    await api.post(backendURL + "/auth/logout");
     clearAuthFlag();
     setUser(undefined);
     queryClient.clear();

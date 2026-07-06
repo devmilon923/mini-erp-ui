@@ -35,7 +35,7 @@ api.interceptors.response.use(
       clearAuthFlag();
       return Promise.reject("Failed to authenticate");
     }
-    return error;
+    return Promise.reject(error);
   },
 );
 
@@ -60,9 +60,18 @@ export const useProfile = () => {
       const result = await api.get("/user/profile");
       return result.data.data;
     },
-    // onSuccess: (data) => {
-    //   console.log(data);
-    // },
+    enabled: typeof window !== "undefined" && hasAuthFlag(),
+  });
+};
+export const useLogout = () => {
+  return useMutation({
+    mutationFn: async () => {
+      const result = await api.get("/auth/logout");
+      return result.data;
+    },
+    onSuccess: () => {
+      clearAuthFlag();
+    },
   });
 };
 export default api;

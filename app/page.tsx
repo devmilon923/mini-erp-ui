@@ -82,7 +82,7 @@ export default function StorefrontPage() {
             href="/login"
             className="inline-flex h-10 items-center gap-2 rounded-pill bg-graphite px-5 text-sm font-medium text-white transition-colors hover:bg-graphite/90"
           >
-            Login
+            Get Started
             <ArrowRight className="h-4 w-4" />
           </Link>
         </div>

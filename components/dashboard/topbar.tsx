@@ -1,6 +1,13 @@
 "use client";
 
-import { Bell, Search, ChevronDown, ShieldCheck, UserCog, Menu } from "lucide-react";
+import {
+  Bell,
+  Search,
+  ChevronDown,
+  ShieldCheck,
+  UserCog,
+  Menu,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,15 +19,20 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 import { RoleBadge } from "@/components/shared/role-badge";
-import type { Role } from "@/lib/types";
-
-const ROLES: Role[] = ["Admin", "Manager", "Employee"];
+import { useAuth } from "@/provider/auth";
+import { useRouter } from "next/navigation";
 
 interface TopbarProps {
   onOpenSidebar: () => void;
 }
 
 export function Topbar({ onOpenSidebar }: TopbarProps) {
+  const { logout } = useAuth();
+  const router = useRouter();
+  const logoutHandler = async () => {
+    logout();
+    router.push("/");
+  };
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-mist bg-canvas/80 px-4 backdrop-blur-md lg:px-8">
       {/* Mobile menu trigger */}
@@ -62,12 +74,15 @@ export function Topbar({ onOpenSidebar }: TopbarProps) {
           <DropdownMenuContent align="end" className="w-64">
             <DropdownMenuLabel className="flex items-center justify-between">
               <span>Account</span>
-              <RoleBadge role={"Employee"} />
+              <RoleBadge role={"employee"} />
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
 
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">
+            <DropdownMenuItem
+              className="text-destructive cursor-pointer"
+              onClick={logoutHandler}
+            >
               Sign out
             </DropdownMenuItem>
           </DropdownMenuContent>
