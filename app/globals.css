@@ -1,0 +1,199 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* MiniERP surface palette */
+    --background: 0 0% 100%; /* Canvas White */
+    --foreground: 0 0% 12.5%; /* Graphite */
+
+    --card: 0 0% 100%; /* Canvas White */
+    --card-foreground: 0 0% 12.5%; /* Graphite */
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 12.5%;
+
+    /* Primary = Graphite (dark filled CTAs) */
+    --primary: 0 0% 12.5%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary = Ash surface */
+    --secondary: 0 0% 93.7%;
+    --secondary-foreground: 0 0% 12.5%;
+
+    --muted: 0 0% 96.1%; /* Fog */
+    --muted-foreground: 0 0% 51%; /* Slate */
+
+    --accent: 0 0% 93.7%; /* Ash */
+    --accent-foreground: 0 0% 12.5%;
+
+    /* Semantic — restrained functional extensions (stock + validation only) */
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --success: 142 45% 42%;
+    --success-foreground: 0 0% 100%;
+    --warning: 38 82% 50%;
+    --warning-foreground: 0 0% 100%;
+
+    --border: 0 0% 91%; /* Mist */
+    --input: 0 0% 91%;
+    --ring: 0 0% 12.5%;
+
+    /* MiniERP raw tokens (non-HSL, for custom utilities) */
+    --color-graphite: #202020;
+    --color-canvas-white: #ffffff;
+    --color-ash: #efefef;
+    --color-fog: #f5f5f5;
+    --color-ivory: #ebe6dd;
+    --color-steel: #4d4d4d;
+    --color-slate: #828282;
+    --color-mist: #e8e8e8;
+    --color-ember-orange: #ff682c;
+    --color-brass: #816729;
+
+    /* Chart strokes */
+    --chart-1: 17 100% 59%; /* Ember Orange */
+    --chart-2: 42 52% 33%; /* Brass */
+    --chart-3: 0 0% 51%; /* Slate */
+    --chart-4: 0 0% 30%; /* Steel */
+    --chart-5: 38 26% 89%; /* Ivory */
+
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family:
+      var(--font-body),
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
+      sans-serif;
+    font-feature-settings: "cv11", "ss01";
+  }
+
+  /* Headings & display — PolySans substitute (Space Grotesk), weight 400 only */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  .font-heading {
+    font-family:
+      var(--font-heading),
+      ui-sans-serif,
+      system-ui,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
+      sans-serif;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer components {
+  /* Editorial display headline — 66px, line-height 0.91 */
+  .display-headline {
+    font-family: var(--font-heading), sans-serif;
+    font-weight: 400;
+    font-size: clamp(2.75rem, 6vw, 4.125rem);
+    line-height: 0.91;
+    letter-spacing: -0.032em;
+    color: var(--color-graphite);
+  }
+
+  /* Asymmetric radius card — signature MiniERP shape (soft top-left) */
+  .card-asymmetric {
+    background-color: var(--color-ash);
+    border-radius: 6px 0 0 0;
+  }
+
+  /* Data dashboard card — white surface, 20px radius, no shadow */
+  .card-data {
+    background-color: var(--color-canvas-white);
+    border-radius: 20px;
+    border: 1px solid var(--color-mist);
+  }
+
+  /* Navigation pill container — 200px radius, ash bg */
+  .nav-pill {
+    background-color: var(--color-ash);
+    border-radius: 200px;
+  }
+
+  /* Ember underline link */
+  .link-ember {
+    color: inherit;
+    text-decoration: underline;
+    text-decoration-color: var(--color-ember-orange);
+    text-underline-offset: 3px;
+    text-decoration-thickness: 1px;
+    transition: color 0.2s ease;
+  }
+  .link-ember:hover {
+    color: var(--color-ember-orange);
+  }
+}
+
+@layer utilities {
+  .text-graphite {
+    color: var(--color-graphite);
+  }
+  .text-steel {
+    color: var(--color-steel);
+  }
+  .text-slate-token {
+    color: var(--color-slate);
+  }
+  .text-ember {
+    color: var(--color-ember-orange);
+  }
+  .text-brass {
+    color: var(--color-brass);
+  }
+  .bg-canvas {
+    background-color: var(--color-canvas-white);
+  }
+  .bg-ash {
+    background-color: var(--color-ash);
+  }
+  .bg-fog {
+    background-color: var(--color-fog);
+  }
+  .bg-ivory {
+    background-color: var(--color-ivory);
+  }
+  .bg-ember {
+    background-color: var(--color-ember-orange);
+  }
+  .border-mist {
+    border-color: var(--color-mist);
+  }
+
+  /* Section rhythm — 80px gaps, alternating surfaces */
+  .section-gap {
+    padding-block: 80px;
+  }
+
+  /* Hide scrollbar for pill nav etc. */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
