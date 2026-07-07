@@ -1,49 +1,65 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Upload, X, Image as ImageIcon } from 'lucide-react';
+import { useState } from "react";
+import { Upload, X, Image as ImageIcon } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Button } from '@/components/ui/button';
-import { CATEGORIES } from '@/lib/mock-data';
-import type { Product } from '@/lib/types';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { CATEGORIES } from "@/lib/mock-data";
+import type { Product } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   initial?: Product;
-  onSubmit: (data: Omit<Product, 'id' | 'image'> & { image?: string }) => void;
+  onSubmit: (data: Omit<Product, "id" | "image"> & { image?: string }) => void;
 };
 
-type Errors = Partial<Record<'name' | 'sku' | 'category' | 'purchasePrice' | 'sellingPrice' | 'stock' | 'image', string>>;
+type Errors = Partial<
+  Record<
+    | "name"
+    | "sku"
+    | "category"
+    | "purchasePrice"
+    | "sellingPrice"
+    | "stock"
+    | "image",
+    string
+  >
+>;
 
-export function ProductFormModal({ open, onOpenChange, initial, onSubmit }: Props) {
-  const [name, setName] = useState(initial?.name ?? '');
-  const [sku, setSku] = useState(initial?.sku ?? '');
-  const [category, setCategory] = useState(initial?.category ?? '');
+export function ProductFormModal({
+  open,
+  onOpenChange,
+  initial,
+  onSubmit,
+}: Props) {
+  const [name, setName] = useState(initial?.name ?? "");
+  const [sku, setSku] = useState(initial?.sku ?? "");
+  const [category, setCategory] = useState(initial?.category ?? "");
   const [purchasePrice, setPurchasePrice] = useState(
-    initial ? String(initial.purchasePrice) : ''
+    initial ? String(initial.purchasePrice) : "",
   );
   const [sellingPrice, setSellingPrice] = useState(
-    initial ? String(initial.sellingPrice) : ''
+    initial ? String(initial.sellingPrice) : "",
   );
-  const [stock, setStock] = useState(initial ? String(initial.stock) : '');
-  const [image, setImage] = useState(initial?.image ?? '');
+  const [stock, setStock] = useState(initial ? String(initial.stock) : "");
+  const [image, setImage] = useState(initial?.image ?? "");
   const [dragOver, setDragOver] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
 
@@ -51,15 +67,15 @@ export function ProductFormModal({ open, onOpenChange, initial, onSubmit }: Prop
 
   const validate = (): boolean => {
     const e: Errors = {};
-    if (!name.trim()) e.name = 'Product name is required';
-    if (!sku.trim()) e.sku = 'SKU is required';
-    if (!category) e.category = 'Select a category';
+    if (!name.trim()) e.name = "Product name is required";
+    if (!sku.trim()) e.sku = "SKU is required";
+    if (!category) e.category = "Select a category";
     if (!purchasePrice || isNaN(Number(purchasePrice)))
-      e.purchasePrice = 'Enter a valid price';
+      e.purchasePrice = "Enter a valid price";
     if (!sellingPrice || isNaN(Number(sellingPrice)))
-      e.sellingPrice = 'Enter a valid price';
-    if (!stock || isNaN(Number(stock))) e.stock = 'Enter a valid quantity';
-    if (!image) e.image = 'Product image is required';
+      e.sellingPrice = "Enter a valid price";
+    if (!stock || isNaN(Number(stock))) e.stock = "Enter a valid quantity";
+    if (!image) e.image = "Product image is required";
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -67,6 +83,15 @@ export function ProductFormModal({ open, onOpenChange, initial, onSubmit }: Prop
   const handleSubmit = (ev: React.FormEvent) => {
     ev.preventDefault();
     if (!validate()) return;
+    console.log({
+      name,
+      sku,
+      category,
+      purchasePrice: Number(purchasePrice),
+      sellingPrice: Number(sellingPrice),
+      stock: Number(stock),
+      image,
+    });
     onSubmit({
       name,
       sku,
@@ -84,7 +109,7 @@ export function ProductFormModal({ open, onOpenChange, initial, onSubmit }: Prop
     ev.preventDefault();
     setDragOver(false);
     setImage(
-      'https://images.pexels.com/photos/4226140/pexels-photo-4226140.jpeg?auto=compress&cs=tinysrgb&w=800'
+      "https://images.pexels.com/photos/4226140/pexels-photo-4226140.jpeg?auto=compress&cs=tinysrgb&w=800",
     );
   };
 
@@ -93,12 +118,12 @@ export function ProductFormModal({ open, onOpenChange, initial, onSubmit }: Prop
       <DialogContent className="max-w-2xl gap-0 border-mist p-0 sm:rounded-data">
         <DialogHeader className="space-y-1 border-b border-mist p-6">
           <DialogTitle className="font-heading text-2xl font-normal tracking-tight text-graphite">
-            {isEdit ? 'Edit product' : 'Add product'}
+            {isEdit ? "Edit product" : "Add product"}
           </DialogTitle>
           <DialogDescription className="text-slate-token">
             {isEdit
-              ? 'Update the product details below.'
-              : 'Fill in the details to add a new product to the catalog.'}
+              ? "Update the product details below."
+              : "Fill in the details to add a new product to the catalog."}
           </DialogDescription>
         </DialogHeader>
 
@@ -110,10 +135,14 @@ export function ProductFormModal({ open, onOpenChange, initial, onSubmit }: Prop
             </Label>
             {image ? (
               <div className="relative overflow-hidden rounded-xl border border-mist">
-                <img src={image} alt="Preview" className="h-44 w-full object-cover" />
+                <img
+                  src={image}
+                  alt="Preview"
+                  className="h-44 w-full object-cover"
+                />
                 <button
                   type="button"
-                  onClick={() => setImage('')}
+                  onClick={() => setImage("")}
                   className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-graphite/70 text-white backdrop-blur-sm transition-colors hover:bg-graphite"
                 >
                   <X className="h-4 w-4" />
@@ -129,11 +158,11 @@ export function ProductFormModal({ open, onOpenChange, initial, onSubmit }: Prop
                 onDrop={handleDrop}
                 onClick={handleDrop as unknown as () => void}
                 className={cn(
-                  'flex h-44 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed transition-colors',
+                  "flex h-44 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed transition-colors",
                   dragOver
-                    ? 'border-ember bg-ember/5'
-                    : 'border-mist bg-fog hover:border-graphite/30',
-                  errors.image && 'border-destructive/50 bg-destructive/5'
+                    ? "border-ember bg-ember/5"
+                    : "border-mist bg-fog hover:border-graphite/30",
+                  errors.image && "border-destructive/50 bg-destructive/5",
                 )}
               >
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-canvas text-slate-token">
@@ -178,8 +207,8 @@ export function ProductFormModal({ open, onOpenChange, initial, onSubmit }: Prop
             <Select value={category} onValueChange={setCategory}>
               <SelectTrigger
                 className={cn(
-                  'h-11 rounded-xl border-mist bg-canvas',
-                  errors.category && 'border-destructive/50'
+                  "h-11 rounded-xl border-mist bg-canvas",
+                  errors.category && "border-destructive/50",
                 )}
               >
                 <SelectValue placeholder="Select a category" />
@@ -239,7 +268,7 @@ export function ProductFormModal({ open, onOpenChange, initial, onSubmit }: Prop
             onClick={handleSubmit}
             className="rounded-pill bg-graphite px-6 text-white hover:bg-graphite/90"
           >
-            {isEdit ? 'Save changes' : 'Add product'}
+            {isEdit ? "Save changes" : "Add product"}
           </Button>
         </div>
       </DialogContent>
@@ -254,7 +283,7 @@ function FormField({
   value,
   onChange,
   placeholder,
-  type = 'text',
+  type = "text",
 }: {
   label: string;
   required?: boolean;
@@ -275,8 +304,8 @@ function FormField({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         className={cn(
-          'h-11 rounded-xl border-mist bg-canvas',
-          error && 'border-destructive/50 focus-visible:ring-destructive/20'
+          "h-11 rounded-xl border-mist bg-canvas",
+          error && "border-destructive/50 focus-visible:ring-destructive/20",
         )}
       />
       {error && <p className="text-xs text-destructive">{error}</p>}
@@ -314,8 +343,8 @@ function PriceField({
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           className={cn(
-            'h-11 rounded-xl border-mist bg-canvas pl-8',
-            error && 'border-destructive/50 focus-visible:ring-destructive/20'
+            "h-11 rounded-xl border-mist bg-canvas pl-8",
+            error && "border-destructive/50 focus-visible:ring-destructive/20",
           )}
         />
       </div>

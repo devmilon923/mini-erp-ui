@@ -15,9 +15,9 @@ import {
 interface UserType {
   name: string;
   email: string;
-  oauthid: string;
-  id: string;
-  role: "admin" | "user";
+  image: string;
+  role: "admin" | "manager" | "employee";
+  _id: string;
 }
 
 interface ContextPayload {

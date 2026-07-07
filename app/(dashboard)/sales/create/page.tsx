@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useMemo, useState } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useMemo, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   ArrowLeft,
   Plus,
@@ -11,14 +11,14 @@ import {
   CheckCircle2,
   ShoppingCart,
   User,
-} from 'lucide-react';
-import { PageHeader } from '@/components/shared/page-header';
-import { Combobox } from '@/components/shared/combobox';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { CUSTOMERS, PRODUCTS } from '@/lib/mock-data';
-import { currency } from '@/lib/format';
-import { cn } from '@/lib/utils';
+} from "lucide-react";
+import { PageHeader } from "@/components/shared/page-header";
+import { Combobox } from "@/components/shared/combobox";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { CUSTOMERS, PRODUCTS } from "@/lib/mock-data";
+import { currency } from "@/lib/format";
+import { cn } from "@/lib/utils";
 
 type Row = {
   id: string;
@@ -32,7 +32,7 @@ export default function CreateSalePage() {
   const router = useRouter();
   const [customerId, setCustomerId] = useState<string>();
   const [rows, setRows] = useState<Row[]>([
-    { id: 'r-1', productId: '', qty: 1 },
+    { id: "r-1", productId: "", qty: 1 },
   ]);
 
   const customerOptions = useMemo(
@@ -42,7 +42,7 @@ export default function CreateSalePage() {
         label: c.name,
         hint: c.email,
       })),
-    []
+    [],
   );
 
   const productOptions = useMemo(
@@ -52,7 +52,7 @@ export default function CreateSalePage() {
         label: p.name,
         hint: `${currency(p.sellingPrice)} · ${p.stock} in stock`,
       })),
-    []
+    [],
   );
 
   const lineItems = rows
@@ -61,16 +61,24 @@ export default function CreateSalePage() {
       if (!product) return null;
       return { row: r, product, lineTotal: product.sellingPrice * r.qty };
     })
-    .filter(Boolean) as { row: Row; product: (typeof PRODUCTS)[number]; lineTotal: number }[];
+    .filter(Boolean) as {
+    row: Row;
+    product: (typeof PRODUCTS)[number];
+    lineTotal: number;
+  }[];
 
   const subtotal = lineItems.reduce((s, x) => s + x.lineTotal, 0);
   const itemCount = lineItems.reduce((s, x) => s + x.row.qty, 0);
   const hasStockWarning = lineItems.some((x) => x.row.qty > x.product.stock);
   const hasEmptyRow = rows.some((r) => !r.productId || r.qty < 1);
-  const canComplete = Boolean(customerId) && lineItems.length > 0 && !hasStockWarning && !hasEmptyRow;
+  const canComplete =
+    Boolean(customerId) &&
+    lineItems.length > 0 &&
+    !hasStockWarning &&
+    !hasEmptyRow;
 
   const addRow = () =>
-    setRows((prev) => [...prev, { id: 'r-' + rowId++, productId: '', qty: 1 }]);
+    setRows((prev) => [...prev, { id: "r-" + rowId++, productId: "", qty: 1 }]);
 
   const removeRow = (id: string) =>
     setRows((prev) => prev.filter((r) => r.id !== id));
@@ -79,8 +87,9 @@ export default function CreateSalePage() {
     setRows((prev) => prev.map((r) => (r.id === id ? { ...r, ...patch } : r)));
 
   const complete = () => {
+    console.log({ subtotal, rows, customerId });
     if (!canComplete) return;
-    router.push('/sales');
+    // router.push('/sales');
   };
 
   return (
@@ -154,7 +163,9 @@ export default function CreateSalePage() {
                         <Combobox
                           options={productOptions}
                           value={row.productId}
-                          onValueChange={(v) => updateRow(row.id, { productId: v })}
+                          onValueChange={(v) =>
+                            updateRow(row.id, { productId: v })
+                          }
                           placeholder="Select a product…"
                           searchPlaceholder="Search products…"
                           emptyText="No products found."
@@ -194,10 +205,10 @@ export default function CreateSalePage() {
                     {product && (overStock || out) && (
                       <div
                         className={cn(
-                          'mt-3 flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium',
+                          "mt-3 flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium",
                           out
-                            ? 'bg-destructive/10 text-destructive'
-                            : 'bg-warning/10 text-warning'
+                            ? "bg-destructive/10 text-destructive"
+                            : "bg-warning/10 text-warning",
                         )}
                       >
                         <AlertTriangle className="h-3.5 w-3.5 shrink-0" />

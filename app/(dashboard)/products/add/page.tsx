@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
-import { PageHeader } from '@/components/shared/page-header';
-import { ProductFormModal } from '@/components/products/product-form-modal';
-import { useState } from 'react';
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import { PageHeader } from "@/components/shared/page-header";
+import { ProductFormModal } from "@/components/products/product-form-modal";
+import { useState } from "react";
 
 export default function AddProductPage() {
   const router = useRouter();
@@ -34,9 +34,9 @@ export default function AddProductPage() {
         open={open}
         onOpenChange={(o) => {
           setOpen(o);
-          if (!o) router.push('/products');
+          if (!o) router.push("/products");
         }}
-        onSubmit={() => router.push('/products')}
+        onSubmit={() => router.push("/products")}
       />
     </div>
   );
