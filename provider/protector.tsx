@@ -21,7 +21,7 @@ export function ProtectRoute({
   useEffect(() => {
     if (!isLoading && isMounted) {
       if (!user) {
-        router.push("/auth/login");
+        router.push("/login");
       } else if (!roles.includes(user.role)) {
         router.push("/unauthorized");
       }
