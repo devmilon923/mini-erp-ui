@@ -1,3 +1,4 @@
+import { TProduct } from "@/components/products/product-form-modal";
 import { TLogin } from "@/validation/auth";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
@@ -78,6 +79,14 @@ export const useFileUpload = () => {
   return useMutation({
     mutationFn: async (data: { fileType: string; fileName: string }) => {
       const result = await api.post("/media/upload", data);
+      return result.data.data;
+    },
+  });
+};
+export const useCreateProduct = () => {
+  return useMutation({
+    mutationFn: async (data: TProduct) => {
+      const result = await api.post("/product/create", data);
       return result.data.data;
     },
   });

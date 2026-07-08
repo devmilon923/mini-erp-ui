@@ -23,7 +23,7 @@ import { Button } from "@/components/ui/button";
 import { CATEGORIES } from "@/lib/mock-data";
 import type { Product } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { useFileUpload } from "@/hooks/endpoints";
+import { useCreateProduct, useFileUpload } from "@/hooks/endpoints";
 import axios from "axios";
 
 type Props = {
@@ -66,13 +66,15 @@ const productSchema = z.object({
 
 type ProductFormValues = z.infer<typeof productSchema>;
 type Errors = Partial<Record<keyof ProductFormValues, string>>;
-
-export function ProductFormModal({
-  open,
-  onOpenChange,
-  initial,
-  onSubmit,
-}: Props) {
+export type TProduct = {
+  name: string;
+  image: string;
+  sku: string;
+  purchasePrice: number;
+  sellingPrice: number;
+  stock: number;
+};
+export function ProductFormModal({ open, onOpenChange, initial }: Props) {
   const [name, setName] = useState(initial?.name ?? "");
   const [sku, setSku] = useState(initial?.sku ?? "");
   const [category, setCategory] = useState(initial?.category ?? "");
@@ -87,7 +89,7 @@ export function ProductFormModal({
   const [dragOver, setDragOver] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
-
+  const createProduct = useCreateProduct();
   const isEdit = Boolean(initial);
   const getPreSignedUrl = useFileUpload();
   const validate = (): ProductFormValues | null => {
@@ -114,45 +116,39 @@ export function ProductFormModal({
     return result.data;
   };
 
-  const handleSubmit = (ev: React.FormEvent) => {
+  const handleSubmit = async (ev: React.FormEvent) => {
     ev.preventDefault();
     const values = validate();
     if (!values) return;
+    if (!image)
+      return setErrors((prev) => ({
+        ...prev,
+        image: "Product image is required",
+      }));
 
-    console.log({
-      ...values,
-      purchasePrice: Number(values.purchasePrice),
-      sellingPrice: Number(values.sellingPrice),
-      stock: Number(values.stock),
-    });
-
-    onSubmit({
-      ...values,
-      purchasePrice: Number(values.purchasePrice),
-      sellingPrice: Number(values.sellingPrice),
-      stock: Number(values.stock),
-    });
-    onOpenChange(false);
-  };
-
-  const logFileInfo = (file?: File | null) => {
-    if (!file) return;
-
-    console.log("Selected file info:", {
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      lastModified: file.lastModified,
-    });
+    try {
+      await createProduct.mutateAsync({
+        ...values,
+        purchasePrice: Number(values.purchasePrice),
+        sellingPrice: Number(values.sellingPrice),
+        stock: Number(values.stock),
+        image,
+      });
+      onOpenChange(false);
+    } catch (error) {
+      console.error("Error creating product:", error);
+    }
   };
 
   const handleSelectedFile = async (file?: File | null) => {
     if (!file) return;
-
-    logFileInfo(file);
-    setImage(URL.createObjectURL(file));
-    setErrors((prev) => ({ ...prev, image: undefined }));
-
+    const allowedExtensions = ["image/png", "image/jpeg", "image/webp"];
+    if (!allowedExtensions.includes(file.type)) {
+      return setErrors((prev) => ({
+        ...prev,
+        image: "Invalid file type. Only PNG, JPG, and WEBP are allowed.",
+      }));
+    }
     try {
       const presignedUrl = await getPreSignedUrl.mutateAsync({
         fileName: file.name,
@@ -164,6 +160,7 @@ export function ProductFormModal({
           "Content-Type": file.type,
         },
       });
+      setImage(presignedUrl.publicUrl);
     } catch (error) {
       console.error("Error uploading file:", error);
     }
