@@ -74,4 +74,12 @@ export const useLogout = () => {
     },
   });
 };
+export const useFileUpload = () => {
+  return useMutation({
+    mutationFn: async (data: { fileType: string; fileName: string }) => {
+      const result = await api.post("/media/upload", data);
+      return result.data.data;
+    },
+  });
+};
 export default api;

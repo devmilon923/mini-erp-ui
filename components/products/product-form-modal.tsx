@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { Upload, X, Image as ImageIcon } from "lucide-react";
+import { useRef, useState } from "react";
+import { Upload } from "lucide-react";
+import { z } from "zod";
 import {
   Dialog,
   DialogContent,
@@ -22,6 +23,8 @@ import { Button } from "@/components/ui/button";
 import { CATEGORIES } from "@/lib/mock-data";
 import type { Product } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { useFileUpload } from "@/hooks/endpoints";
+import axios from "axios";
 
 type Props = {
   open: boolean;
@@ -30,18 +33,39 @@ type Props = {
   onSubmit: (data: Omit<Product, "id" | "image"> & { image?: string }) => void;
 };
 
-type Errors = Partial<
-  Record<
-    | "name"
-    | "sku"
-    | "category"
-    | "purchasePrice"
-    | "sellingPrice"
-    | "stock"
-    | "image",
-    string
-  >
->;
+const productSchema = z.object({
+  name: z.string().trim().min(1, "Product name is required"),
+  sku: z.string().trim().min(1, "SKU is required"),
+  category: z.string().trim().min(1, "Select a category"),
+  purchasePrice: z
+    .string()
+    .trim()
+    .min(1, "Enter a valid price")
+    .refine(
+      (value) => !Number.isNaN(Number(value)) && Number(value) > 0,
+      "Enter a valid price",
+    ),
+  sellingPrice: z
+    .string()
+    .trim()
+    .min(1, "Enter a valid price")
+    .refine(
+      (value) => !Number.isNaN(Number(value)) && Number(value) > 0,
+      "Enter a valid price",
+    ),
+  stock: z
+    .string()
+    .trim()
+    .min(1, "Enter a valid quantity")
+    .refine(
+      (value) => Number.isInteger(Number(value)) && Number(value) >= 0,
+      "Enter a valid quantity",
+    ),
+  image: z.string().trim().min(1, "Product image is required"),
+});
+
+type ProductFormValues = z.infer<typeof productSchema>;
+type Errors = Partial<Record<keyof ProductFormValues, string>>;
 
 export function ProductFormModal({
   open,
@@ -62,56 +86,103 @@ export function ProductFormModal({
   const [image, setImage] = useState(initial?.image ?? "");
   const [dragOver, setDragOver] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isEdit = Boolean(initial);
+  const getPreSignedUrl = useFileUpload();
+  const validate = (): ProductFormValues | null => {
+    const result = productSchema.safeParse({
+      name,
+      sku,
+      category,
+      purchasePrice,
+      sellingPrice,
+      stock,
+      image,
+    });
 
-  const validate = (): boolean => {
-    const e: Errors = {};
-    if (!name.trim()) e.name = "Product name is required";
-    if (!sku.trim()) e.sku = "SKU is required";
-    if (!category) e.category = "Select a category";
-    if (!purchasePrice || isNaN(Number(purchasePrice)))
-      e.purchasePrice = "Enter a valid price";
-    if (!sellingPrice || isNaN(Number(sellingPrice)))
-      e.sellingPrice = "Enter a valid price";
-    if (!stock || isNaN(Number(stock))) e.stock = "Enter a valid quantity";
-    if (!image) e.image = "Product image is required";
-    setErrors(e);
-    return Object.keys(e).length === 0;
+    if (!result.success) {
+      const nextErrors = result.error.flatten().fieldErrors;
+      const formattedErrors = Object.fromEntries(
+        Object.entries(nextErrors).map(([key, value]) => [key, value?.[0]]),
+      ) as Errors;
+      setErrors(formattedErrors);
+      return null;
+    }
+
+    setErrors({});
+    return result.data;
   };
 
   const handleSubmit = (ev: React.FormEvent) => {
     ev.preventDefault();
-    if (!validate()) return;
+    const values = validate();
+    if (!values) return;
+
     console.log({
-      name,
-      sku,
-      category,
-      purchasePrice: Number(purchasePrice),
-      sellingPrice: Number(sellingPrice),
-      stock: Number(stock),
-      image,
+      ...values,
+      purchasePrice: Number(values.purchasePrice),
+      sellingPrice: Number(values.sellingPrice),
+      stock: Number(values.stock),
     });
+
     onSubmit({
-      name,
-      sku,
-      category,
-      purchasePrice: Number(purchasePrice),
-      sellingPrice: Number(sellingPrice),
-      stock: Number(stock),
-      image,
+      ...values,
+      purchasePrice: Number(values.purchasePrice),
+      sellingPrice: Number(values.sellingPrice),
+      stock: Number(values.stock),
     });
     onOpenChange(false);
   };
 
-  // Drag-and-drop is UI-only; we simulate a "dropped" image with a placeholder.
-  const handleDrop = (ev: React.DragEvent) => {
+  const logFileInfo = (file?: File | null) => {
+    if (!file) return;
+
+    console.log("Selected file info:", {
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      lastModified: file.lastModified,
+    });
+  };
+
+  const handleSelectedFile = async (file?: File | null) => {
+    if (!file) return;
+
+    logFileInfo(file);
+    setImage(URL.createObjectURL(file));
+    setErrors((prev) => ({ ...prev, image: undefined }));
+
+    try {
+      const presignedUrl = await getPreSignedUrl.mutateAsync({
+        fileName: file.name,
+        fileType: file.type,
+      });
+
+      await axios.put(presignedUrl.signedUrl, file, {
+        headers: {
+          "Content-Type": file.type,
+        },
+      });
+    } catch (error) {
+      console.error("Error uploading file:", error);
+    }
+  };
+
+  const handleFileChange = async (ev: React.ChangeEvent<HTMLInputElement>) => {
+    const file = ev.target.files?.[0];
+    await handleSelectedFile(file);
+  };
+
+  const handleDrop = async (ev: React.DragEvent) => {
     ev.preventDefault();
     setDragOver(false);
-    setImage(
-      "https://images.pexels.com/photos/4226140/pexels-photo-4226140.jpeg?auto=compress&cs=tinysrgb&w=800",
-    );
+
+    const file = ev.dataTransfer.files?.[0];
+    await handleSelectedFile(file);
   };
+
+  const openFilePicker = () => fileInputRef.current?.click();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -137,7 +208,7 @@ export function ProductFormModal({
               <div className="relative overflow-hidden rounded-xl border border-mist">
                 <img
                   src={image}
-                  alt="Preview"
+                  alt="Selected preview"
                   className="h-44 w-full object-cover"
                 />
                 <button
@@ -145,7 +216,7 @@ export function ProductFormModal({
                   onClick={() => setImage("")}
                   className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-full bg-graphite/70 text-white backdrop-blur-sm transition-colors hover:bg-graphite"
                 >
-                  <X className="h-4 w-4" />
+                  ×
                 </button>
               </div>
             ) : (
@@ -156,7 +227,7 @@ export function ProductFormModal({
                 }}
                 onDragLeave={() => setDragOver(false)}
                 onDrop={handleDrop}
-                onClick={handleDrop as unknown as () => void}
+                onClick={openFilePicker}
                 className={cn(
                   "flex h-44 cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed transition-colors",
                   dragOver
@@ -172,6 +243,13 @@ export function ProductFormModal({
                   Drag &amp; drop or click to upload
                 </p>
                 <p className="text-xs text-slate-token">PNG, JPG up to 5MB</p>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
               </div>
             )}
             {errors.image && (
@@ -187,6 +265,7 @@ export function ProductFormModal({
               error={errors.name}
               value={name}
               onChange={setName}
+              type="text"
               placeholder="e.g. Aurora Wireless Earbuds"
             />
             <FormField
