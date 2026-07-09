@@ -8,7 +8,6 @@ import { Separator } from "@/components/ui/separator";
 import { RoleBadge } from "@/components/shared/role-badge";
 
 export default function SettingsPage() {
-
   return (
     <div className="space-y-8">
       <PageHeader
@@ -22,7 +21,7 @@ export default function SettingsPage() {
             Profile
           </h3>
           <p className="mt-1 text-sm text-slate-token">
-            Currently acting as <RoleBadge role={"Employee"} className="ml-1" />
+            Currently acting as <RoleBadge role={"employee"} className="ml-1" />
           </p>
           <Separator className="my-5" />
           <div className="space-y-5">

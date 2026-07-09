@@ -9,12 +9,14 @@ import {
   Users,
   Settings,
   Boxes,
+  Tags,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/products", label: "Products", icon: Package },
+  { href: "/categories", label: "Categories", icon: Tags },
   { href: "/sales", label: "Sales", icon: Receipt },
   { href: "/customers", label: "Customers", icon: Users },
   { href: "/settings", label: "Settings", icon: Settings },

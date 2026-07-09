@@ -20,6 +20,12 @@ export type Customer = {
   avatar?: string;
 };
 
+export type Category = {
+  id: string;
+  name: string;
+  status: "draft" | "active" | "disabled";
+};
+
 export type SaleItem = {
   productId: string;
   name: string;
